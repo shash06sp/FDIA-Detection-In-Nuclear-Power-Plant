@@ -88,3 +88,36 @@ The deployment of the Time-Series Transformer successfully closes the vulnerabil
 
 ## 9. Conclusion
 As nuclear facilities modernize and digitize, the attack surface for advanced persistent threats expands. This project demonstrates that combining rigorous deterministic mathematical modeling (via MATLAB digital twins) with stochastic deep learning (PyTorch Transformers) yields state-of-the-art security for critical infrastructure. The resulting model not only achieves unparalleled accuracy but does so while strictly respecting the complex kinetic reality of a nuclear reactor.
+
+## Dataset Access & Structure
+* **Dataset Download:** [Nuclear Reactor Cyber-Physical FDIA Dataset on Kaggle](## Dataset Access & Structure
+
+The complete training and benchmark dataset is hosted publicly on Kaggle due to GitHub file-size constraints.
+
+* **Dataset Download:** [Nuclear Reactor Cyber-Physical FDIA Dataset on Kaggle](https://www.kaggle.com/datasets/shashi636/fdia-nuclear-dataset) *(Insert your Kaggle dataset URL here)*
+* **Format:** Apache Parquet (`cps_training_data_fast_30k.parquet`)
+* **Scale:** 1.8 million temporal observations across 30,000 independent simulation runs
+* **License:** Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+### Telemetry Breakdown
+The dataset captures 18 distinct multi-channel parameters per time step across three functional groups:
+
+* **Ground-Truth Physical State:** `True_Flux`, `True_Prec`, `True_Temp`, `True_Xenon`, `True_Valve`
+* **SCADA Sensor Telemetry:** `Sens_Flux`, `Sens_Prec`, `Sens_Temp`, `Sens_Xenon`, `Sens_Valve`
+* **Kalman Residuals:** `Res_Flux`, `Res_Prec`, `Res_Temp`, `Res_Xenon`, `Res_Valve`
+* **Metadata & Targets:** `Sim_ID`, `Time`, `Label` (0: Safe Baseline, 1: Naive Attack, 2: Stealth FDIA)
+
+To run the training pipeline, place the downloaded `.parquet` file directly into the repository root directory before executing `main_final.ipynb`.) 
+* **Format:** Apache Parquet (`cps_training_data_fast_30k.parquet`)
+* **Scale:** 1.8 million temporal observations across 30,000 independent simulation runs
+* **License:** Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+### Telemetry Breakdown
+The dataset captures 18 distinct multi-channel parameters per time step across three functional groups:
+
+* **Ground-Truth Physical State:** `True_Flux`, `True_Prec`, `True_Temp`, `True_Xenon`, `True_Valve`
+* **SCADA Sensor Telemetry:** `Sens_Flux`, `Sens_Prec`, `Sens_Temp`, `Sens_Xenon`, `Sens_Valve`
+* **Kalman Residuals:** `Res_Flux`, `Res_Prec`, `Res_Temp`, `Res_Xenon`, `Res_Valve`
+* **Metadata & Targets:** `Sim_ID`, `Time`, `Label` (0: Safe Baseline, 1: Naive Attack, 2: Stealth FDIA)
+
+To run the training pipeline, place the downloaded `.parquet` file directly into the repository root directory before executing `main_final.ipynb`.
