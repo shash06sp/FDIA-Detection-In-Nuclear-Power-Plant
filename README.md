@@ -26,16 +26,48 @@ Historically, power plants rely on:
 
 ## 4. Methods and Methodologies
 This project adopts a dual-stack cyber-physical methodology:
-1. **Physical Simulation (MATLAB):** The `reactor_simulation.m` and `simulation_graph.m` scripts model the non-linear reactor point kinetics and thermodynamic coupling in a strict state-space matrix. This serves as a digital twin, generating high-fidelity baseline data and simulating sophisticated, mathematically sound stealth attacks.
-2. **Deep Learning Optimization (Python/PyTorch):** The `main_final.ipynb` notebook engineers a deep learning pipeline to ingest the telemetry. The data is processed into multidimensional sliding windows and fed into a custom classification engine. 
+1. **Physical Simulation (MATLAB):** Modeling the non-linear reactor point kinetics and thermodynamic coupling in a strict state-space matrix. This digital twin generates high-fidelity baseline data and simulates sophisticated stealth attacks.
+2. **Deep Learning Optimization (Python/PyTorch):** Processing the telemetry into multidimensional sliding windows and feeding it into a custom PyTorch classification engine. 
 
-## 5. Proposed Solution: The Time-Series Transformer
-To overcome the limitations of LSTMs, this repository proposes a **Time-Series Transformer** architecture. 
-* **Multi-Head Self-Attention:** Instead of processing time sequentially, the Transformer analyzes all variables across a 40-step operational time window simultaneously. 
-* **Thermodynamic Cross-Correlation:** The attention mechanism inherently learns the physical coupling between variables. Even if an attacker perfectly balances the mathematical residual of the temperature sensor, the Transformer detects the micro-divergences in delayed variables (like Xenon residuals), exposing the spoofed telemetry.
+![MATLAB Digital Twin Simulation](Results/matlab_plant_simulation.png)
+*(Figure 1: Multi-panel MATLAB simulation demonstrating the physical divergence during a stealth FDIA. The true physical Xenon-135 concentration obeys the laws of thermodynamics, breaking correlation with the spoofed sensor data.)*
 
-## 6. Dataset and Results
+## 5. Mathematical Modelling and Framework
+To successfully detect a stealth attack, the defense mechanism must understand both the physical kinematics of the reactor and the linear algebra of the attacker's injection vector.
+
+### 5.1. Reactor State-Space Dynamics
+The nuclear reactor's core dynamics are modeled using a linearized continuous-time state-space representation. The state vector $x(t) \in \mathbb{R}^5$ captures the physical reality: 
+$$x(t) = [\delta n, \delta c, \delta T_f, \delta X, \delta V]^T$$
+Where the variables represent deviations in neutron flux, delayed neutron precursors, fuel temperature, Xenon-135 concentration, and control valve positioning, respectively. The system evolves according to:
+$$\dot{x}(t) = Ax(t) + Bu(t) + w(t)$$
+$$y(t) = Cx(t) + v(t)$$
+Here, $w(t)$ and $v(t)$ represent stochastic process and measurement noise.
+
+### 5.2. The Zero-Residual Eigenvector Attack
+A standard anomaly detector calculates the residual $r(t)$ between the observed sensor data $y(t)$ and the expected state $\hat{x}(t)$. An alarm is triggered if $||r(t)|| > \tau$. 
+
+During a stealth FDIA, the attacker injects a malicious vector $a(t)$ into the SCADA sensors:
+$$y_a(t) = y(t) + a(t)$$
+To bypass the alarm, the attacker designs $a(t)$ such that it lies entirely within the unobservable subspace of the system matrix $A$. By spoofing the temperature sensor downward ($a_{temp} < 0$) while simultaneously manipulating the flux sensor upward ($a_{flux} > 0$), the attacker mathematically balances the residual equation:
+$$||r_a(t)|| \leq \tau$$
+This effectively blinds the Kalman filter while the true core temperature $x_3(t)$ rises toward a meltdown.
+
+### 5.3. Time-Series Transformer Defense
+To defeat the zero-residual attack, this framework replaces linear state-estimation with a multi-head self-attention mechanism. The Transformer does not look at a single timestamp; it ingests a sequence matrix $X \in \mathbb{R}^{S \times F}$ (where sequence length $S = 40$ and features $F = 10$).
+
+The self-attention matrix cross-references the thermodynamic consistency of all variables simultaneously:
+$$Attention(Q, K, V) = softmax\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
+Because the physical accumulation of Xenon-135 ($\delta X$) operates on a delayed time-constant compared to prompt neutron flux ($\delta n$), the attacker's instant linear injection breaks the temporal physics of the system. The attention weights $QK^T$ mathematically highlight this cross-channel temporal discrepancy, exposing the spoofed telemetry regardless of the balanced residual.
+
+## 6. Proposed Solution: The Transformer Architecture
+* **Positional Encoding:** Injects sine and cosine wave frequencies into the data matrix, forcing the stochastic model to understand the deterministic arrow of time and thermodynamic lag.
+* **Multi-Head Self-Attention:** Analyzes variables across a 40-step operational time window, allowing the network to untangle the stealth attack by observing the long-term physics rather than short-term linear residuals.
+
+## 7. Dataset and Results
 The model was trained and evaluated on a custom-engineered Parquet dataset comprising **1.38 million sliding windows** spanning normal operations, naive attacks, and zero-residual stealth attacks. 
+
+![Parquet Dataset Structure](Results/dataset_screenshot.png)
+*(Figure 2: Raw dataset structure displaying sensor telemetry, mathematical residuals, and the multi-class labeling matrix.)*
 
 ### Model Performance Metrics
 * **Total Parameters Optimized:** ~150,000+
@@ -43,19 +75,14 @@ The model was trained and evaluated on a custom-engineered Parquet dataset compr
 * **F1-Score (Stealth Attack):** 0.9986
 * **False Positive Rate (Normal State):** ~0.039% (Critically low, ensuring the reactor is not subjected to costly false scrams).
 
-### Visualizing the Physical Divergence
-*(Note: Upload your PDF/PNG graphics to the `Results` folder and link them here)*
-
-The Transformer effectively maps the divergence between the true physical state and the spoofed SCADA data. As demonstrated in the results, the AI detects the thermodynamic decoupling almost instantly after the eigenvector injection, well before the true core temperature reaches critical meltdown thresholds.
-
 ![Confusion Matrix](Results/confusion_matrix_results.png)
-*(Figure 1: The model achieves a near-perfect classification matrix, strictly limiting false positive alarms.)*
+*(Figure 3: The model achieves a near-perfect classification matrix, strictly limiting false positive alarms.)*
 
 ![Timeline Trajectory](Results/stealth_attack_timeline_crisp.png)
-*(Figure 2: Real-time detection timeline showcasing the AI flagging the exact moment the spoofed sensor reading deviates from the true physical meltdown trajectory.)*
+*(Figure 4: Real-time detection timeline showcasing the AI flagging the exact moment the spoofed sensor reading deviates from the true physical meltdown trajectory.)*
 
-## 7. Outcome
+## 8. Outcome
 The deployment of the Time-Series Transformer successfully closes the vulnerability gap exploited by stealth FDIAs. By shifting the detection paradigm from purely mathematical state-estimation to physics-aware, self-attention neural networks, the system can autonomously identify and flag cyber-physical intrusions with sub-second latency.
 
-## 8. Conclusion
-As nuclear facilities modernize and digitize, the attack surface for advanced persistent threats expands. This project demonstrates that combining rigorous deterministic operations research (via MATLAB digital twins) with stochastic deep learning (PyTorch Transformers) yields state-of-the-art security for critical infrastructure. The resulting model not only achieves unparalleled accuracy but does so while strictly respecting the complex kinetic reality of a nuclear reactor.
+## 9. Conclusion
+As nuclear facilities modernize and digitize, the attack surface for advanced persistent threats expands. This project demonstrates that combining rigorous deterministic mathematical modeling (via MATLAB digital twins) with stochastic deep learning (PyTorch Transformers) yields state-of-the-art security for critical infrastructure. The resulting model not only achieves unparalleled accuracy but does so while strictly respecting the complex kinetic reality of a nuclear reactor.
