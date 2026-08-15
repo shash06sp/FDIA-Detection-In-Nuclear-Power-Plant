@@ -29,7 +29,7 @@ This project adopts a dual-stack cyber-physical methodology:
 1. **Physical Simulation (MATLAB):** Modeling the non-linear reactor point kinetics and thermodynamic coupling in a strict state-space matrix. This digital twin generates high-fidelity baseline data and simulates sophisticated stealth attacks.
 2. **Deep Learning Optimization (Python/PyTorch):** Processing the telemetry into multidimensional sliding windows and feeding it into a custom PyTorch classification engine. 
 
-![MATLAB Digital Twin Simulation](Results/matlab_simulation_graph.pdf)
+![MATLAB Digital Twin Simulation](Results/matlab_simulation_graph.PNG)
 *(Figure 1: Multi-panel MATLAB simulation demonstrating the physical divergence during a stealth FDIA. The true physical Xenon-135 concentration obeys the laws of thermodynamics, breaking correlation with the spoofed sensor data.)*
 
 ## 5. Mathematical Modelling and Framework
@@ -75,10 +75,10 @@ The model was trained and evaluated on a custom-engineered Parquet dataset compr
 * **F1-Score (Stealth Attack):** 0.9986
 * **False Positive Rate (Normal State):** ~0.039% (Critically low, ensuring the reactor is not subjected to costly false scrams).
 
-![Confusion Matrix](Results/confusion_matrix_results.pdf)
+![Confusion Matrix](Results/confusion_matrix_results.PNG)
 *(Figure 3: The model achieves a near-perfect classification matrix, strictly limiting false positive alarms.)*
 
-![Timeline Trajectory](Results/stealth_attack_timeline.pdf)
+![Timeline Trajectory](Results/stealth_attack_timeline.PNG)
 *(Figure 4: Real-time detection timeline showcasing the AI flagging the exact moment the spoofed sensor reading deviates from the true physical meltdown trajectory.)*
 
 ## 8. Outcome
