@@ -90,11 +90,7 @@ The deployment of the Time-Series Transformer successfully closes the vulnerabil
 As nuclear facilities modernize and digitize, the attack surface for advanced persistent threats expands. This project demonstrates that combining rigorous deterministic mathematical modeling (via MATLAB digital twins) with stochastic deep learning (PyTorch Transformers) yields state-of-the-art security for critical infrastructure. The resulting model not only achieves unparalleled accuracy but does so while strictly respecting the complex kinetic reality of a nuclear reactor.
 
 ## Dataset Access & Structure
-* **Dataset Download:** [Nuclear Reactor Cyber-Physical FDIA Dataset on Kaggle](## Dataset Access & Structure
-
-The complete training and benchmark dataset is hosted publicly on Kaggle due to GitHub file-size constraints.
-
-* **Dataset Download:** [Nuclear Reactor Cyber-Physical FDIA Dataset on Kaggle](https://www.kaggle.com/datasets/shashi636/fdia-nuclear-dataset) *(Insert your Kaggle dataset URL here)*
+* **Dataset Download:** [Nuclear Reactor Cyber-Physical FDIA Dataset on Kaggle](https://www.kaggle.com/datasets/shashi636/fdia-nuclear-dataset) 
 * **Format:** Apache Parquet (`cps_training_data_fast_30k.parquet`)
 * **Scale:** 1.8 million temporal observations across 30,000 independent simulation runs
 * **License:** Creative Commons Attribution 4.0 International (CC BY 4.0)
